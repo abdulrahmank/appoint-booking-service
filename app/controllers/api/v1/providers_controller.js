@@ -2,16 +2,14 @@ const Provider = require('../../../models/provider')
 
 class ProvidersController {
     static index(request, response) {
-        const provider = new Provider();
-        provider.connect().then(() => {
-            provider.findAll(request.query.name)
-                    .then((result) => response.send(result));
+        Provider.connect().then(() => {
+            Provider.findAll(request.query.name)
+                    .then((results) => response.send(results));
         })
     }
     static show(request, response) {
-        const provider = new Provider();
-        provider.connect().then(() => {
-            provider.find(request.params.providerId)
+        Provider.connect().then(() => {
+            Provider.find(request.params.providerId)
                     .then((results) => response.send(results));
         })
     }

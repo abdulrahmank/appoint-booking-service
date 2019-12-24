@@ -1,14 +1,10 @@
 const MongoClient = require('mongodb').MongoClient
 
 class BaseModel {
-    async connect() {
+    static async connect(collectionName) {
         const client = await MongoClient.connect(process.env.MONGO_DB_URL);
-        this.collection = client.db(process.env.MONGO_DB).collection(this.getCollectionName());
-    }
-
-    getCollectionName() {
-        return ''
+        return client.db(process.env.MONGO_DB).collection(collectionName);
     }
 }
 
-module.exports = BaseModel;
+module.exports = BaseModel
