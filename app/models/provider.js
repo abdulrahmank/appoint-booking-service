@@ -3,7 +3,7 @@ const BaseModel = require('./base_model')
 class Provider extends BaseModel {
     
     async findAll(providerName) {
-        const query = providerName ? {"name" : /.*providerName.*/} : {};
+        const query = providerName ? {"name" : new RegExp('.*' + providerName + '.*')} : {};
         const providers = await this.collection.find(query).toArray();
         return providers;
     }

@@ -4,7 +4,7 @@ class ProvidersController {
     static index(request, response) {
         const provider = new Provider();
         provider.connect().then(() => {
-            provider.findAll()
+            provider.findAll(request.query.name)
                     .then((result) => response.send(result));
         })
     }
