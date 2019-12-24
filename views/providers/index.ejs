@@ -3,7 +3,7 @@
         <style>
             .appointment-block {
                 display: inline-block;
-                width: 100px;
+                width: 150px;
                 height: 100px;
                 padding: 5px;
                 margin: 5px;
@@ -24,6 +24,28 @@
             }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script>
+            $(function() {
+                $('.make-available').click(function(event) {
+                    var target = $(event.target);
+                    if (!target.hasClass('appointment-block')) {
+                        target = $(target.parent('.appointment-block'));
+                    }
+                    if (target.hasClass('available')) {
+                        alert('Slot already made available for booking!');
+                        return
+                    }
+                    const startTime = $(target.children('.start-time').first()).text();
+                    const endTime = $(target.children('.end-time').first()).text();
+                    $.post("/api/v1/providers/<%=provider.id%>/slots", {startTime, endTime}, function(xhr, result) {
+                        if (result == 'success') {
+                            target.removeClass('un_available').addClass('available');
+                            target.children('.make-available').removeClass('un_available').addClass('available');
+                        }
+                    });
+                });
+            })
+        </script>
     </head>
     <body>
         <div> <b> Name: </b> <%= provider.name %> </div>
@@ -35,6 +57,7 @@
             <div class='appointment-block <%= slot.status %>'>
                 <div class='start-time'><%= slot.startTime %></div>
                 <div class='end-time'><%= slot.endTime %></div>
+                <button class='make-available <%= slot.status %>'>Make available</button>
             </div>
 
         <% }); %>
