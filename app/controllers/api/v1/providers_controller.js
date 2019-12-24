@@ -11,7 +11,7 @@ class ProvidersController {
     static show(request, response) {
         const provider = new Provider();
         provider.connect().then(() => {
-            provider.find(request.params.provider_id)
+            provider.find(request.params.providerId)
                     .then((results) => response.send(results));
         })
     }
