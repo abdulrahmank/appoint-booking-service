@@ -11,7 +11,7 @@ class Slot {
     }
 
     static async connect() {
-        return BaseModel.connect()
+        this.collection = await BaseModel.connect('providers');
     }
 
     static async create(providerId, startTime, endTime) {
@@ -19,17 +19,17 @@ class Slot {
             { _id: new mongo.ObjectID(providerId) },
             {
                 $push: {
-                    slots: [
-                        new Slot(providerId, {
-                            startTime, 
-                            endTime,
+                    slots:
+                        new Slot(new mongo.ObjectID(providerId), {
+                            _id: new mongo.ObjectID(),
+                            startTime: startTime,
+                            endTime: endTime,
                             appointments: {
                                 accepted: [],
                                 pending: [],
                                 declined: []
                             }
                         })
-                    ]
                 }
             }
         )

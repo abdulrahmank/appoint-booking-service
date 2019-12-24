@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <style>
+            .appointment-block {
+                display: inline-block;
+                width: 100px;
+                height: 100px;
+                padding: 5px;
+                margin: 5px;
+            }
+            .un_available {background-color: grey;}
+            .available {background-color: green;}
+            .booked {background-color: red;}
+            .start-time:before{
+                content: "Start time: ";
+                font-weight: bold;
+            }
+            .end-time:before{
+                content: "End time: ";
+                font-weight: bold;
+            }
+            button.available {
+                visibility: hidden;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div> <b> Name: </b> <%= provider.name %> </div>
+        <div> <b> Services: </b> <%= provider.services.join(', ') %> </div>
+        <div> <b> Location: </b> <%= provider.location %> </div>
+
+        <% slots.forEach( (slot) => {%>
+
+            <div class='appointment-block <%= slot.status %>'>
+                <div class='start-time'><%= slot.startTime %></div>
+                <div class='end-time'><%= slot.endTime %></div>
+            </div>
+
+        <% }); %>
+    </body>
+</html>
