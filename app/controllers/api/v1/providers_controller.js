@@ -3,7 +3,8 @@ const Provider = require('../../../models/provider')
 class ProvidersController {
     static index(request, response) {
         Provider.connect().then(() => {
-            Provider.findAll(request.query.name)
+            const query = request.query.name ? request.query.name : '';
+            Provider.findAll(query.toLowerCase())
                     .then((results) => response.send(results));
         })
     }
