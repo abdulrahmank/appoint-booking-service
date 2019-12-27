@@ -2,7 +2,7 @@
   "name": "appointment_service",
   "version": "1.0.0",
   "description": "Service to hold information of service providers and their appointment slots",
-  "main": "app/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha lib/**/**.spec.js",
     "dev": "nodemon index.js"

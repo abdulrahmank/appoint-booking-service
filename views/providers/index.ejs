@@ -24,7 +24,43 @@
             }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-messaging.js"></script>
         <script>
+            firebase.initializeApp({
+                'messagingSenderId': '<%= process.env.FCM_SERNDER_ID %>'
+            })
+            const messaging = firebase.messaging();
+            function initFirebaseMessagingRegistration() {
+                messaging
+                    .requestPermission()
+                    .then(function () {
+                        console.log("Got notification permission");
+                        return messaging.getToken();
+                    })
+                    .then(function (token) {
+                        // print the token on the HTML page
+                        tokenElement.innerHTML = "Token is " + token;
+                    })
+                    .catch(function (err) {
+                        errorElement.innerHTML = "Error: " + err;
+                        console.log("Didn't get notification permission", err);
+                    });
+            }
+            messaging.onMessage(function (payload) {
+                console.log("Message received. ", JSON.stringify(payload));
+            });
+            messaging.onTokenRefresh(function () {
+                messaging.getToken()
+                    .then(function (refreshedToken) {
+                        console.log('Token refreshed.');
+                    }).catch(function (err) {
+                        console.log('Unable to retrieve refreshed token ', err);
+                    });
+            });
+            $(document).ready(function() {
+                initFirebaseMessagingRegistration();
+            });
             $(function() {
                 $('.make-available').click(function(event) {
                     var target = $(event.target);
