@@ -38,12 +38,19 @@
                         console.log("Got notification permission");
                         return messaging.getToken();
                     })
-                    .then(function (token) {
-                        // print the token on the HTML page
-                        tokenElement.innerHTML = "Token is " + token;
+                    .then(function(token) {
+                        const userId = readCookie('userId');
+                        $.post(`/api/v1/users/${userId}/access_token`, {
+                            accessToken: token,
+                        },function(xhr, result) {
+                            if (result == 'success') {
+                                console.log('FCM Token updated successfully!')
+                            } else {
+                                console.log('FCM Token updation failed!')
+                            }
+                        });
                     })
                     .catch(function (err) {
-                        errorElement.innerHTML = "Error: " + err;
                         console.log("Didn't get notification permission", err);
                     });
             }
@@ -81,6 +88,16 @@
                     });
                 });
             })
+            function readCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
         </script>
     </head>
     <body>

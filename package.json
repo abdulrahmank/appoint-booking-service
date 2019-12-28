@@ -15,10 +15,14 @@
     "nodemon": "^2.0.2"
   },
   "dependencies": {
+    "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
     "ejs": "^3.0.1",
     "express": "^4.17.1",
+    "express-basic-auth": "^1.2.0",
+    "express-session": "^1.17.0",
     "moment": "^2.24.0",
-    "mongodb": "^3.4.1"
+    "mongodb": "^3.4.1",
+    "nodejs-base64": "^1.0.3"
   }
 }

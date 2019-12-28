@@ -20,7 +20,6 @@ class ProvidersController {
             const providerSlot = provider.slots.filter((slot) => {
                 return moment(slot.startTime, 'HH:mm').format('HH:mm') == startTimeStr
             })[0];
-            debugger;
             if (providerSlot) {
                 const slotObj = new Slot(provider.id, providerSlot)
                 slots.push({
