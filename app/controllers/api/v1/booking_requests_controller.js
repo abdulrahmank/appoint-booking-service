@@ -5,9 +5,7 @@ const NotificationService = require('../../../service/notification_service');
 
 class BookingRequesController {
     static create(request, response) {
-        debugger;
         Promise.all([BookingRequest.connect(), Slot.connect()]).then(() => {
-            debugger;
             BookingRequest.create(request.body).then((bookingRequest) => {
                 Slot.addBookingRequest(bookingRequest.providerId,
                     bookingRequest.slotId, bookingRequest.id).then(async () => {

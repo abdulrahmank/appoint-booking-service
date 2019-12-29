@@ -33,7 +33,6 @@ class User {
     }
 
     async updateFCMAccessToken(fcmAccessToken) {
-        debugger;
         await this.collection.update(
             { _id: new mongo.ObjectID(this.id) },
             {

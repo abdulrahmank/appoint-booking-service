@@ -45,13 +45,12 @@ class Slot {
     }
 
     static async addBookingRequest(providerId, slotId, bookingRequestId) {
-        debugger;
         await this.collection.updateOne({ 
             "_id": new mongo.ObjectID(providerId), 
             "slots._id": new mongo.ObjectID(slotId)
         }, { 
             $push : {
-                'slots.$.pending_booking_requests': bookingRequestId.id
+                'slots.$.pending_booking_requests': bookingRequestId
             }
         });
     }
