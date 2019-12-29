@@ -6,7 +6,7 @@ class User {
     constructor(user, collection) {
         this.name = user.name;
         this.id = user._id;
-        this.accessToken = user.accessToken;
+        this.fcmAccessToken = user.fcmAccessToken;
         this.passwordDigest = user.passwordDigest;
         this.collection = collection;
     }
@@ -17,7 +17,6 @@ class User {
 
     static async find(userId) {
         const user = await this.collection.find({ "_id": new mongo.ObjectID(userId) }).toArray();
-        debugger;
         return new User(user[0], this.collection);
     }
 
@@ -26,13 +25,20 @@ class User {
         return new User(user[0], this.collection);
     }
 
-    async updateFCMAccessToken(accessToken) {
+    static async findByProviderId(providerId) {
+        const users = await this.collection.find({ "providerId": new mongo.ObjectID(providerId) }).toArray();
+        return users.map((userObj) => {
+            return new User(userObj, this.collection);
+        })
+    }
+
+    async updateFCMAccessToken(fcmAccessToken) {
         debugger;
         await this.collection.update(
             { _id: new mongo.ObjectID(this.id) },
             {
                 $set: {
-                    fcmAccessToken: accessToken,
+                    fcmAccessToken: fcmAccessToken,
                 }
             }
         );
