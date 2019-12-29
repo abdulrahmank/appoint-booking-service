@@ -25,8 +25,10 @@ class NotificationService {
         var message = {
             to: user.fcmAccessToken, 
             notification: {
-                title: 'Request for appointment', 
-                body,
+                title: 'Request for appointment',
+                body: body,
+                icon: '/tazweed-logo.png',
+                click_action: data && data.bookingRequestId ? `http://localhost:3000/requests/${data.bookingRequestId}`: 'http://localhost:3000'
             },
             data
         };
