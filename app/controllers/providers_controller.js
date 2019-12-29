@@ -23,6 +23,7 @@ class ProvidersController {
             if (providerSlot) {
                 const slotObj = new Slot(provider.id, providerSlot)
                 slots.push({
+                    _id: slotObj._id,
                     startTime: slotObj.startTime,
                     endTime: slotObj.endTime,
                     status: slotObj.getStatus()

@@ -5,11 +5,11 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
         <style>
-            .un_available {background-color: grey;}
             .available {background-color: green;}
             .booked {background-color: red;}
             .appointment-block{
-                display: inline-block;
+                margin: 5px;
+                padding-bottom: 5px;
             }
             .start-time:before{
                 content: "Start time: ";
@@ -24,6 +24,9 @@
             }
             a.booked {
                 visibility: hidden;
+            }
+            body {
+                padding-top: 10px;
             }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -63,6 +66,9 @@
             messaging.onMessage(function (payload) {
                 console.log("Message received. ", JSON.stringify(payload));
                 $.get(`/api/v1/requests/${payload.data.bookingRequestId}`, function(bookingReqData, status){
+                    if(!$($.find('#'+bookingReqData.slot._id)).hasClass('available')) {
+                        return;
+                    }
                     bootbox.dialog({ 
                         title: 'Appointment booking request',
                         message: `<p>User ${bookingReqData.user.name} has requested for slot starting with ${bookingReqData.slot.startTime}` +
@@ -81,6 +87,7 @@
                                         success: function(data) {
                                             console.log('success');
                                             console.log(JSON.stringify(data));
+                                            location.reload();
                                         }
                                     });
                                 }
@@ -127,8 +134,8 @@
                         alert('Slot already made available for booking!');
                         return
                     }
-                    const startTime = $(target.children('.start-time').first()).text();
-                    const endTime = $(target.children('.end-time').first()).text();
+                    const startTime = $(target.children().children('.start-time').first()).text();
+                    const endTime = $(target.children().children('.end-time').first()).text();
                     $.post("/api/v1/providers/<%=provider.id%>/slots", {startTime, endTime}, function(xhr, result) {
                         if (result == 'success') {
                             target.removeClass('un_available').addClass('available');
@@ -151,23 +158,27 @@
         <title>Book an appointment</title>
     </head>
     <body>
-        <div class="container">
-            <div> <b> Name: </b> <%= provider.name %> </div>
-            <div> <b> Services: </b> <%= provider.services.join(', ') %> </div>
-            <div> <b> Location: </b> <%= provider.location %> </div>
+        <div class="container card">
+            <div class="card-body text-center">
+                <div > <b> Name: </b> <%= provider.name %> </div>
+                <div > <b> Services: </b> <%= provider.services.join(', ') %> </div>
+                <div > <b> Location: </b> <%= provider.location %> </div>
+            </div>
         </div>
         <div class="container">
-            <% slots.forEach( (slot, index) => {%>
-                <div class=<%= index % 4 == 0 ? 'row': '' %>>
-                    <div class='appointment-block <%= slot.status %> col-4 card'>
+            <% for (var i = 0; i < slots.length; i = i + 4) {%>
+                <div class='row'>
+                    <% for (var j = 0; j < 4; j++) {%>
+                    <div id='<%= slots[i + j]._id %>' class='appointment-block <%= slots[i + j].status %> col-sm card' >
                         <div class='card-body'>
-                            <div class='start-time card-text'><%= slot.startTime %></div>
-                            <div class='end-time card-text'><%= slot.endTime %></div>
-                            <a class='btn btn-primary make-available <%= slot.status %>'>Make available</a>
+                            <div class='start-time card-text'><%= slots[i + j].startTime %></div>
+                            <div class='end-time card-text'><%= slots[i + j].endTime %></div>
                         </div>
+                        <a class='btn btn-primary make-available <%= slots[i + j].status %>'>Make available</a>
                     </div>
+                    <% } %>
                 </div>
-            <% }); %>
+            <% } %>
         </div>
     </body>
 </html>
