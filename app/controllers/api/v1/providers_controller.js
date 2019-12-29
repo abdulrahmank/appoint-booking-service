@@ -1,4 +1,5 @@
 const Provider = require('../../../models/provider')
+const Slot = require('../../../models/slot').Slot;
 
 class ProvidersController {
     static index(request, response) {
@@ -10,8 +11,13 @@ class ProvidersController {
     }
     static show(request, response) {
         Provider.connect().then(() => {
-            Provider.find(request.params.providerId)
-                    .then((results) => response.send(results));
+            Provider.find(request.params.providerId).then((providerDetails) => {
+                providerDetails.slots = 
+                    providerDetails.slots
+                        .filter((slot) => Slot.isNotBooked(slot))
+                        .sort((slot1, slot2) => slot1.startTime > slot2.startTime );
+                response.send(providerDetails);
+            });
         })
     }
 }

@@ -83,6 +83,10 @@ class Slot {
         ]);
     }
 
+    static isNotBooked(slot) {
+        return slot.accepted_booking_requests.length == 0;
+    }
+
     toJSON() {
         return {
             _id: this._id,
