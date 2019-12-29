@@ -4,6 +4,7 @@ const ProvidersController = require('./app/controllers/providers_controller')
 const BookingRequestsController = require('./app/controllers/booking_requests_controller')
 const SlotsController = require('./app/controllers/api/v1/slots_controller')
 const AccessTokensController = require('./app/controllers/api/v1/fcm/access_tokens_controller')
+const SignInController = require('./app/controllers/api/v1/sign_in_controller')
 
 const credentialsAuthorizer = require('./app/middleware/credentials_authorizer')
 const initiateCookie = require('./app/middleware/initiate_cookie_middleware')
@@ -35,6 +36,7 @@ app.post('/api/v1/users/:userId/access_token', AccessTokensController.create);
 app.post('/api/v1/requests', BookingRequestsControllerApi.create);
 app.put('/api/v1/requests/:bookingRequestId', BookingRequestsControllerApi.update);
 app.get('/api/v1/requests/:bookingRequestId', BookingRequestsControllerApi.show);
+app.post('/api/v1/signIn', SignInController.signIn);
 
 app.get('/providers/:providerId', [auth, initiateCookie], ProvidersController.show);
 app.get('/requests/:bookingRequestId', [auth], BookingRequestsController.show);
