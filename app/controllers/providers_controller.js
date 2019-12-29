@@ -4,7 +4,7 @@ const statuses = require('../models/slot').statuses;
 const moment = require('moment');
 
 class ProvidersController {
-    static async index(request, response) {
+    static async show(request, response) {
         await Provider.connect();
         const provider = await Provider.find(request.params.providerId);
 

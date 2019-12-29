@@ -4,6 +4,9 @@ const mongo = require('mongodb');
 class User {
 
     constructor(user, collection) {
+        if (!user) {
+            return;
+        }
         this.name = user.name;
         this.id = user._id;
         this.fcmAccessToken = user.fcmAccessToken;

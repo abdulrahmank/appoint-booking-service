@@ -37,11 +37,18 @@ class Slot {
     }
 
     static async find(providerId, slotId) {
-        const slot = await this.collection.find({ 
-            "_id": new mongo.ObjectID(providerId),
-            "slots._id":  new mongo.ObjectID(slotId)
-        }).toArray();
-        return new Slot(slot[0]);
+        const provider = await this.collection.aggregate([
+            {
+                $match: { _id: new mongo.ObjectID(providerId) }
+            }
+            ,{
+                $project: { slots: { $filter: {
+                input: "$slots",
+                as:"slot",
+                cond: { $eq : ["$$slot._id", new mongo.ObjectID(slotId)] }
+            } } }
+        }]).toArray();
+        return new Slot(providerId, provider[0].slots[0]);
     }
 
     static async addBookingRequest(providerId, slotId, bookingRequestId) {
@@ -58,20 +65,22 @@ class Slot {
     static async updateBookingRequest(providerId, slotId, bookingRequestId, status) {
         var desiredRequestState = {};
         desiredRequestState[`slots.$.${status}_booking_requests`] = new mongo.ObjectID(bookingRequestId.id);
-        await Promise.all(this.collection.updateOne({
-            "_id": new mongo.ObjectID(providerId),
-            "slots._id": new mongo.ObjectID(slotId)
-        }, {
-            $pull : {
-                'slots.$.pending_booking_requests': new mongo.ObjectID(bookingRequestId.id)
-            }
-        }),
-        this.collection.updateOne({
-            "_id": new mongo.ObjectID(providerId),
-            "slots._id": new mongo.ObjectID(slotId)
-        }, {
-            $push : desiredRequestState,
-        }));
+        await Promise.all([
+            this.collection.updateOne({
+                "_id": new mongo.ObjectID(providerId),
+                "slots._id": new mongo.ObjectID(slotId)
+            }, {
+                $pull : {
+                    'slots.$.pending_booking_requests': new mongo.ObjectID(bookingRequestId.id)
+                }
+            }),
+            this.collection.updateOne({
+                "_id": new mongo.ObjectID(providerId),
+                "slots._id": new mongo.ObjectID(slotId)
+            }, {
+                $push : desiredRequestState,
+            })
+        ]);
     }
 
     toJSON() {

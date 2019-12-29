@@ -1,9 +1,8 @@
 const BookingRequest = require('../../../models/booking_request');
 const Slot = require('../../../models/slot').Slot;
-const User = require('../../../models/user');
 const NotificationService = require('../../../service/notification_service');
 
-class BookingRequesController {
+class BookingRequestsController {
     static create(request, response) {
         Promise.all([BookingRequest.connect(), Slot.connect()]).then(() => {
             BookingRequest.create(request.body).then((bookingRequest) => {
@@ -37,22 +36,6 @@ class BookingRequesController {
             response.send('Notified users successfully!');
         });
     }
-
-    static async show(request, response) {
-        await BookingRequest.connect();
-        await User.connect();
-        await Provider.connect();
-        
-        const bookingRequest = BookingRequest.find(request.params.bookingRequestId);
-        const user = User.find(bookingRequest.userId);
-        const slot = Slot.find(bookingRequest.providerId, bookingRequest.slotId);
-
-        response.render('../views/booking_requests/show', {
-            bookingRequest,
-            user,
-            slot
-        });
-    }
 }
 
-module.exports = BookingRequesController;
+module.exports = BookingRequestsController;

@@ -1,4 +1,5 @@
-const BaseModel = require('./base_model')
+const BaseModel = require('./base_model');
+const mongo = require('mongodb');
 
 class BookingRequest {
 
@@ -20,7 +21,7 @@ class BookingRequest {
 
     static async find(requestId) {
         const bookingRequest = await this.collection.find({ "_id": new mongo.ObjectID(requestId) }).toArray();
-        return new BookingRequest(bookingRequest);
+        return new BookingRequest(bookingRequest[0]);
     }
 }
 

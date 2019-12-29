@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script>
+            $(function() {
+                $('.accept').click(function(event) {
+                    const bookingRequestId = '<%= bookingRequest.id %>';
+                    var data = {};
+                    data.status = $(event.target).data('action');
+                    $.ajax({
+						type: 'PUT',
+						data: JSON.stringify(data),
+				        contentType: 'application/json',
+                        url: `/api/v1/requests/${bookingRequestId}`,						
+                        success: function(data) {
+                            console.log('success');
+                            console.log(JSON.stringify(data));
+                        }
+                    });
+                })
+            })
+        </script>
+    </head>
+
+    <body>
+        <div>
+            User <%= user.name, %> has requested for following appointment:
+        </div>
+        <div>
+            <b>Appointment details:</b>
+            <b>Start time:</b> <%= slot.startTime %>
+            <b>End time:</b> <%= slot.endTime %>
+        </div>
+        
+        <button class='accept' data-action='accepted'> Accept </button>
+        <button class='reject' data-action='rejected'> Reject </button>
+    </body>
+</html>
