@@ -7,7 +7,10 @@ class Slot {
         this._id = slotJson._id;
         this.startTime = slotJson.startTime;
         this.endTime = slotJson.endTime;
-        this.appointments = slotJson.appointments;
+        this.accepted_booking_requests = slotJson.accepted_booking_requests;
+        this.pending_booking_requests = slotJson.pending_booking_requests;
+        this.rejected_booking_requests = slotJson.rejected_booking_requests;
+        this.status = this.getStatus();
     }
 
     static async connect() {
@@ -24,15 +27,52 @@ class Slot {
                             _id: new mongo.ObjectID(),
                             startTime: startTime,
                             endTime: endTime,
-                            appointments: {
-                                accepted: [],
-                                pending: [],
-                                declined: []
-                            }
+                            accepted_booking_requests: [],
+                            pending_booking_requests: [],
+                            rejected_booking_requests: []
                         }).toJSON()
                 }
             }
         )
+    }
+
+    static async find(providerId, slotId) {
+        const slot = await this.collection.find({ 
+            "_id": new mongo.ObjectID(providerId),
+            "slots._id":  new mongo.ObjectID(slotId)
+        }).toArray();
+        return new Slot(slot[0]);
+    }
+
+    static async addBookingRequest(providerId, slotId, bookingRequestId) {
+        debugger;
+        await this.collection.updateOne({ 
+            "_id": new mongo.ObjectID(providerId), 
+            "slots._id": new mongo.ObjectID(slotId)
+        }, { 
+            $push : {
+                'slots.$.pending_booking_requests': bookingRequestId.id
+            }
+        });
+    }
+
+    static async updateBookingRequest(providerId, slotId, bookingRequestId, status) {
+        var desiredRequestState = {};
+        desiredRequestState[`slots.$.${status}_booking_requests`] = new mongo.ObjectID(bookingRequestId.id);
+        await Promise.all(this.collection.updateOne({
+            "_id": new mongo.ObjectID(providerId),
+            "slots._id": new mongo.ObjectID(slotId)
+        }, {
+            $pull : {
+                'slots.$.pending_booking_requests': new mongo.ObjectID(bookingRequestId.id)
+            }
+        }),
+        this.collection.updateOne({
+            "_id": new mongo.ObjectID(providerId),
+            "slots._id": new mongo.ObjectID(slotId)
+        }, {
+            $push : desiredRequestState,
+        }));
     }
 
     toJSON() {
@@ -40,13 +80,15 @@ class Slot {
             _id: this._id,
             startTime: this.startTime,
             endTime: this.endTime,
-            appointments: this.appointments,
+            accepted_booking_requests: this.accepted_booking_requests,
+            pending_booking_requests: this.pending_booking_requests,
+            rejected_booking_requests: this.rejected_booking_requests,
             status: this.getStatus()
         }
     }
 
     getStatus() {
-        if (this.appointments.accepted.length > 0) {
+        if (this.accepted_booking_requests.length > 0) {
             return statuses.BOOKED;
         } else if (this.providerId) {
             return statuses.AVAILABLE;
