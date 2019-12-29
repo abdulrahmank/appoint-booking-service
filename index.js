@@ -32,8 +32,9 @@ app.get('/api/v1/providers', ProvidersControllerApi.index);
 app.get('/api/v1/providers/:providerId', ProvidersControllerApi.show);
 app.post('/api/v1/providers/:providerId/slots', SlotsController.create);
 app.post('/api/v1/users/:userId/access_token', AccessTokensController.create);
-app.post('/api/v1/requests/create', BookingRequestsControllerApi.create);
+app.post('/api/v1/requests', BookingRequestsControllerApi.create);
 app.put('/api/v1/requests/:bookingRequestId', BookingRequestsControllerApi.update);
+app.get('/api/v1/requests/:bookingRequestId', BookingRequestsControllerApi.show);
 
 app.get('/providers/:providerId', [auth, initiateCookie], ProvidersController.show);
 app.get('/requests/:bookingRequestId', [auth], BookingRequestsController.show);

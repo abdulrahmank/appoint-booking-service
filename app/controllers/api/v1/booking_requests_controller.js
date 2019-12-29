@@ -1,4 +1,6 @@
 const BookingRequest = require('../../../models/booking_request');
+const User = require('../../../models/user');
+const Provider = require('../../../models/provider');
 const Slot = require('../../../models/slot').Slot;
 const NotificationService = require('../../../service/notification_service');
 
@@ -26,7 +28,6 @@ class BookingRequestsController {
                 case 'rejected':
                     Slot.updateBookingRequest(bookingRequest.providerId,
                         bookingRequest.slotId, bookingRequest.id, updatedStatus).then(() => {
-                       new NotificationService().notifyServiceProviders(bookingRequest);
                        new NotificationService().notifyUser(bookingRequest.userId, updatedStatus);   
                     });
                     break;                                                                                                              
@@ -34,6 +35,25 @@ class BookingRequestsController {
                     console.log('Unknown status!');
             }
             response.send('Notified users successfully!');
+        });
+    }
+
+    static show(request, response) {
+        Promise.all([
+            BookingRequest.connect(),
+            User.connect(),
+            Provider.connect(),
+            Slot.connect()
+        ]).then(async () => {
+            const bookingRequest = await BookingRequest.find(request.params.bookingRequestId);
+            const user = await User.find(bookingRequest.userId);
+            const slot = await Slot.find(bookingRequest.providerId, bookingRequest.slotId);
+        
+            response.send({
+                bookingRequest,
+                user,
+                slot
+            });
         });
     }
 }

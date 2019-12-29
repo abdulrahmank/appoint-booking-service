@@ -4,14 +4,13 @@
         <script>
             $(function() {
                 $('.accept').click(function(event) {
-                    const bookingRequestId = '<%= bookingRequest.id %>';
                     var data = {};
                     data.status = $(event.target).data('action');
                     $.ajax({
 						type: 'PUT',
 						data: JSON.stringify(data),
 				        contentType: 'application/json',
-                        url: `/api/v1/requests/${bookingRequestId}`,						
+                        url: '/api/v1/requests/<%= bookingRequest.id %>',
                         success: function(data) {
                             console.log('success');
                             console.log(JSON.stringify(data));
