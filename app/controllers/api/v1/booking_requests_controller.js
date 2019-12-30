@@ -11,7 +11,7 @@ class BookingRequestsController {
                 Slot.addBookingRequest(bookingRequest.providerId,
                     bookingRequest.slotId, bookingRequest.id).then(async () => {
                     new NotificationService().notifyServiceProviders(bookingRequest).then(() => {
-                        response.send('Notified service providers successfully!');
+                        response.send({message: 'Notified service providers successfully!'});
                     });
                 });
                 
@@ -34,7 +34,7 @@ class BookingRequestsController {
                 default:
                     console.log('Unknown status!');
             }
-            response.send('Notified users successfully!');
+            response.send({message: 'Notified users successfully!'});
         });
     }
 
