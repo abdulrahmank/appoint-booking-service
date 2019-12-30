@@ -9,16 +9,21 @@ class ProvidersController {
                     .then((results) => response.send(results));
         })
     }
-    static show(request, response) {
-        Provider.connect().then(() => {
-            Provider.find(request.params.providerId).then((providerDetails) => {
-                providerDetails.slots = 
-                    providerDetails.slots
-                        .filter((slot) => Slot.isNotBooked(slot))
-                        .sort((slot1, slot2) => slot1.startTime > slot2.startTime );
-                response.send(providerDetails);
-            });
-        })
+    static async show(request, response) {
+        await Provider.connect();
+        const providerDetails  = await Provider.find(request.params.providerId);
+        var availableSlots = [];
+        const appointmentDate = request.query.date;
+        for (var i = 0; i < providerDetails.slots.length; i++) {
+            const slot = providerDetails.slots[i];
+            const isSlotAvailable = await Slot.isAvailable(slot, appointmentDate);
+            if(isSlotAvailable) {
+                availableSlots.push(slot);
+            }
+        }
+        providerDetails.slots = availableSlots
+            .sort((slot1, slot2) => slot1.startTime > slot2.startTime );
+        response.send(providerDetails);
     }
 }
 

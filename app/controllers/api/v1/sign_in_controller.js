@@ -7,9 +7,7 @@ class SignInController {
         await User.connect();
         const user = await User.findByName(username);
         const password = request.body.password;
-        debugger;
         bcrypt.compare(password, user.passwordDigest, (err, success) => {
-            debugger;
             if (success) {
                 response.send({userId: user.id});
             } else {

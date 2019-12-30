@@ -22,11 +22,12 @@ class ProvidersController {
             })[0];
             if (providerSlot) {
                 const slotObj = new Slot(provider.id, providerSlot)
+                const slotStatus = await slotObj.getStatus();
                 slots.push({
                     _id: slotObj._id,
                     startTime: slotObj.startTime,
                     endTime: slotObj.endTime,
-                    status: slotObj.getStatus()
+                    status: slotStatus
                 });
             } else {
                 slots.push({

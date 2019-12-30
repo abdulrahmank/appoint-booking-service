@@ -24,6 +24,13 @@ class BookingRequest {
         const bookingRequest = await this.collection.find({ "_id": new mongo.ObjectID(requestId) }).toArray();
         return new BookingRequest(bookingRequest[0]);
     }
+
+    static async findAll(requestIds) {
+        const bookingRequests = await this.collection.find({ "_id": {
+            $in : requestIds.map((requestId) => new mongo.ObjectID(requestId))
+        }}).toArray();
+        return bookingRequests.map((bookingRequest) => new BookingRequest(bookingRequest));
+    }
 }
 
 module.exports = BookingRequest

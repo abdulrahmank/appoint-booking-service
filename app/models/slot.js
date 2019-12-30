@@ -65,14 +65,14 @@ class Slot {
 
     static async updateBookingRequest(providerId, slotId, bookingRequestId, status) {
         var desiredRequestState = {};
-        desiredRequestState[`slots.$.${status}_booking_requests`] = new mongo.ObjectID(bookingRequestId.id);
+        desiredRequestState[`slots.$.${status}_booking_requests`] = bookingRequestId;
         await Promise.all([
             this.collection.updateOne({
                 "_id": new mongo.ObjectID(providerId),
                 "slots._id": new mongo.ObjectID(slotId)
             }, {
                 $pull : {
-                    'slots.$.pending_booking_requests': new mongo.ObjectID(bookingRequestId.id)
+                    'slots.$.pending_booking_requests': bookingRequestId
                 }
             }),
             this.collection.updateOne({
@@ -84,8 +84,15 @@ class Slot {
         ]);
     }
 
-    static isNotBooked(slot) {
-        return slot.accepted_booking_requests.length == 0;
+    static async isAvailable(slot, date) {
+        if (slot.accepted_booking_requests.length == 0) {
+            return true;
+        } else {
+            const slotStatus = await Slot.
+                _checkGivenDateAppointment(slot.accepted_booking_requests, new Date(date));
+            debugger;
+            return slotStatus == statuses.AVAILABLE;
+        }
     }
 
     toJSON() {
@@ -100,15 +107,10 @@ class Slot {
         }
     }
 
-    getStatus() {
+    async getStatus() {
         if (this.accepted_booking_requests.length > 0) {
-            this.accepted_booking_requests.map(async (bookingRequestId) => {
-                const bookingRequest = await BookingRequest.find(bookingRequestId);
-                if (this._isToday(new Date(bookingRequest.date))) {
-                    return statuses.BOOKED;
-                }
-            });
-            return statuses.AVAILABLE;
+            const status = await Slot._checkGivenDateAppointment(this.accepted_booking_requests, new Date())
+            return status;
         } else if (this.providerId) {
             return statuses.AVAILABLE;
         } else {
@@ -116,11 +118,21 @@ class Slot {
         }
     }
 
-    _isToday(someDate) {
-        const today = new Date()
-        return someDate.getDate() == today.getDate() &&
-            someDate.getMonth() == today.getMonth() &&
-            someDate.getFullYear() == today.getFullYear()
+    static _isSameday(date1, date2) {
+        return date1.getDate() == date2.getDate() &&
+            date1.getMonth() == date2.getMonth() &&
+            date1.getFullYear() == date2.getFullYear()
+    }
+
+    static async _checkGivenDateAppointment(accepted_booking_requests, date) {
+        await BookingRequest.connect();
+        const bookingRequests = await BookingRequest.findAll(accepted_booking_requests);
+        for(var i = 0; i < bookingRequests.length; i++) {
+            if (Slot._isSameday(new Date(bookingRequests[i].date), date)) {
+                return statuses.BOOKED;
+            }
+        }
+        return statuses.AVAILABLE;
     }
  
 }
