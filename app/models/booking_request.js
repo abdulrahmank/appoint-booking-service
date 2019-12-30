@@ -8,6 +8,7 @@ class BookingRequest {
         this.providerId = bookingRequest.providerId;
         this.userId = bookingRequest.userId;
         this.slotId = bookingRequest.slotId;
+        this.date = bookingRequest.date;
     }
 
     static async connect() {

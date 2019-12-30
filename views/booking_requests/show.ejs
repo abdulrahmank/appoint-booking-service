@@ -9,10 +9,12 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
         <script>
             $(function() {
+                const appointmentDate = new Date(<%= bookingRequest.date %>);
                 bootbox.dialog({ 
                     title: 'Appointment booking request',
                     message: '<p>User <%= user.name %> has requested for slot starting with <%= slot.startTime %>' +
-                                ' and ending with <%= slot.endTime %></p>',
+                                ' and ending with <%= slot.endTime %> on date(dd-mm-yyyy):'+
+                                ' <%= appointmentDate.getDate()+"-"+appointmentDate.getMonth()+"-"+appointmentDate.getYear() %></p>',
                     size: 'large',
                     buttons: {
                         Accept: {

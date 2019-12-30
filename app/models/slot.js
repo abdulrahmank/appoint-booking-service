@@ -1,4 +1,5 @@
 const BaseModel = require('./base_model')
+const BookingRequest = require('./booking_request');
 const mongo = require('mongodb');
 
 class Slot {
@@ -101,13 +102,27 @@ class Slot {
 
     getStatus() {
         if (this.accepted_booking_requests.length > 0) {
-            return statuses.BOOKED;
+            this.accepted_booking_requests.map(async (bookingRequestId) => {
+                const bookingRequest = await BookingRequest.find(bookingRequestId);
+                if (this._isToday(new Date(bookingRequest.date))) {
+                    return statuses.BOOKED;
+                }
+            });
+            return statuses.AVAILABLE;
         } else if (this.providerId) {
             return statuses.AVAILABLE;
         } else {
             return statuses.UN_AVAILABLE;
         }
     }
+
+    _isToday(someDate) {
+        const today = new Date()
+        return someDate.getDate() == today.getDate() &&
+            someDate.getMonth() == today.getMonth() &&
+            someDate.getFullYear() == today.getFullYear()
+    }
+ 
 }
 
 const statuses = {

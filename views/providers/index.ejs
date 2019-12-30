@@ -66,13 +66,15 @@
             messaging.onMessage(function (payload) {
                 console.log("Message received. ", JSON.stringify(payload));
                 $.get(`/api/v1/requests/${payload.data.bookingRequestId}`, function(bookingReqData, status){
+                    const appointmentDate = bookingReqData.bookingRequest.date;
                     if(!$($.find('#'+bookingReqData.slot._id)).hasClass('available')) {
                         return;
                     }
                     bootbox.dialog({ 
                         title: 'Appointment booking request',
                         message: `<p>User ${bookingReqData.user.name} has requested for slot starting with ${bookingReqData.slot.startTime}` +
-                                 ` and ending with ${bookingReqData.slot.endTime}</p>`,
+                                 ` and ending with ${bookingReqData.slot.endTime} on date(dd-mm-yyyy):`+
+                                 ` ${appointmentDate.getDate()+"-"+appointmentDate.getMonth()+"-"+appointmentDate.getYear()}</p>` ,
                         size: 'large',
                         buttons: {
                             Accept: {
